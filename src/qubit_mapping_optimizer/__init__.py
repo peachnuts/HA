@@ -29,3 +29,7 @@
 # The fact that you  are presently reading this  means that you have had
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
+
+from .mapping_to_str import mapping_to_str
+from .mapping import iterative_mapping_algorithm
+from .hardware import IBMQHardwareArchitecture
