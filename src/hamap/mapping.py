@@ -60,12 +60,21 @@ def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit
     return result
 
 
-def _adapt_quantum_circuit_arity(
-    circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture
+def _adapt_quantum_circuit_and_mapping_arity(
+    circuit: QuantumCircuit,
+    initial_mapping: ty.Dict[Qubit, int],
+    hardware: IBMQHardwareArchitecture,
 ) -> None:
-    missing_qubits = hardware.qubit_number - circuit.n_qubits
-    if missing_qubits > 0:
-        circuit.add_register(QuantumRegister(missing_qubits))
+    missing_qubit_number = hardware.qubit_number - circuit.n_qubits
+    if missing_qubit_number > 0:
+        register = QuantumRegister(missing_qubit_number)
+        circuit.add_register(register)
+        missing_qubit_indices = set(range(hardware.qubit_number)) - set(
+            initial_mapping.values()
+        )
+        initial_mapping.update(
+            {qubit: i for i, qubit in zip(missing_qubit_indices, register)}
+        )
 
 
 def ha_mapping(
@@ -109,7 +118,7 @@ def ha_mapping(
     :return: The final circuit along with the mapping obtained at the end of the
         iterative procedure.
     """
-    _adapt_quantum_circuit_arity(quantum_circuit, hardware)
+    _adapt_quantum_circuit_and_mapping_arity(quantum_circuit, initial_mapping, hardware)
     # Creating the internal data structures that will be used in this function.
     dag_circuit = circuit_to_dag(quantum_circuit)
     distance_matrix = get_distance_matrix(hardware)
@@ -231,7 +240,7 @@ def ha_mapping_paper_compliant(
     :return: The final circuit along with the mapping obtained at the end of the
         iterative procedure.
     """
-    _adapt_quantum_circuit_arity(quantum_circuit, hardware)
+    _adapt_quantum_circuit_and_mapping_arity(quantum_circuit, hardware)
     # Creating the internal data structures that will be used in this function.
     dag_circuit = circuit_to_dag(quantum_circuit)
     distance_matrix = get_distance_matrix(hardware)
