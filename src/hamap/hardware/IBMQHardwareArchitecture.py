@@ -39,7 +39,7 @@ import networkx as nx
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGNode
 
-from .HardwareArchitecture import HardwareArchitecture
+from hamap.hardware.HardwareArchitecture import HardwareArchitecture
 
 logger = logging.getLogger("hamap.IBMQHardwareArchitecture")
 
