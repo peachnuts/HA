@@ -33,19 +33,22 @@
 import typing as ty
 
 import numpy
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.converters.circuit_to_dag import circuit_to_dag
 from qiskit.converters.dag_to_circuit import dag_to_circuit
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 
-from hamap.distance_matrix import get_distance_matrix_mixed
-from hamap.gates import TwoQubitGate
+from hamap.distance_matrix import (
+    get_distance_matrix_mixed,
+    get_distance_matrix_swap_number,
+)
+from hamap.gates import TwoQubitGate, SwapTwoQubitGate, BridgeTwoQubitGate
 from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
-from hamap.heuristics import sabre_heuristic
+from hamap.heuristics import sabre_heuristic, sabre_heuristic_with_effect
 from hamap.layer import QuantumLayer, update_layer
 from hamap.mapping_to_str import mapping_to_str
-from hamap.swap import get_all_swap_bridge_candidates
+from hamap.swap import get_all_swap_bridge_candidates, get_all_swap_candidates
 
 
 def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit:
@@ -158,6 +161,145 @@ def ha_mapping(
             current_mapping = best_swap_qubits.update_mapping(current_mapping)
             explored_mappings.add(mapping_to_str(current_mapping))
             best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer)
+        # Anyway, update the current front_layer
+        current_node_index = update_layer(
+            front_layer, topological_nodes, current_node_index
+        )
+
+    # We are done here, we just need to return the results
+    # resulting_dag_quantum_circuit.draw(scale=1, filename="qcirc.dot")
+    resulting_circuit = dag_to_circuit(resulting_dag_quantum_circuit)
+    return resulting_circuit, current_mapping
+
+
+def ha_mapping_paper_compliant(
+    quantum_circuit: QuantumCircuit,
+    initial_mapping: ty.Dict[Qubit, int],
+    hardware: IBMQHardwareArchitecture,
+    swap_cost_and_effect_heuristic: ty.Callable[
+        [
+            IBMQHardwareArchitecture,  # Hardware information
+            QuantumLayer,  # Current front layer
+            ty.List[DAGNode],  # Topologically sorted list of nodes
+            int,  # Index of the first non-processed gate.
+            ty.Dict[Qubit, int],  # The mapping before applying the tested SWAP/Bridge
+            numpy.ndarray,  # The distance matrix between each qubits
+            TwoQubitGate,  # The SWAP/Bridge we want to rank
+        ],
+        ty.Tuple[
+            float,  # Cost of the SWAP pair
+            float,  # Effect of the SWAP pair on the other gates
+        ],
+    ] = sabre_heuristic_with_effect,
+    get_candidates: ty.Callable[
+        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Set[str],],
+        ty.List[SwapTwoQubitGate],
+    ] = get_all_swap_candidates,
+    get_distance_matrix: ty.Callable[
+        [IBMQHardwareArchitecture], numpy.ndarray
+    ] = lambda hardware: get_distance_matrix_mixed(hardware, 0.5, 0, 0.5),
+) -> ty.Tuple[QuantumCircuit, ty.Dict[Qubit, int]]:
+    """Map the given quantum circuit to the hardware topology provided.
+
+    This implementation uses the exact same algorithm described in the associated
+    scientific paper. Another implementation using a different method to choose
+    between SWAP and Bridge is available as `:py:func:`~hamap.mapping.ha_mapping`.
+
+    :param quantum_circuit: the quantum circuit to map.
+    :param initial_mapping: the initial mapping used to start the iterative mapping
+        algorithm.
+    :param hardware: hardware data such as connectivity, gate time, gate errors, ...
+    :param swap_cost_and_effect_heuristic: the heuristic cost function that will
+        estimate the cost of a given SWAP according to the current state of the circuit
+        and the effect of the SWAP on the following quantum gates. The two floats
+        should be returned as a tuple (cost, effect).
+    :param get_candidates: a function that takes as input the current front
+        layer and the hardware description and that returns a list of tuples
+        representing the SWAP that should be considered by the heuristic.
+    :param get_distance_matrix: a function that takes as first (and only) parameter the
+        hardware representation and that outputs a numpy array containing the cost of
+        performing a SWAP between each pair of qubits.
+    :return: The final circuit along with the mapping obtained at the end of the
+        iterative procedure.
+    """
+    # Creating the internal data structures that will be used in this function.
+    dag_circuit = circuit_to_dag(quantum_circuit)
+    distance_matrix = get_distance_matrix(hardware)
+    resulting_dag_quantum_circuit = _create_empty_dagcircuit_from_existing(dag_circuit)
+    current_mapping = initial_mapping
+    explored_mappings: ty.Set[str] = set()
+    # Sorting all the quantum operations in topological order once for all.
+    # May require significant memory on large circuits...
+    topological_nodes: ty.List[DAGNode] = list(dag_circuit.topological_op_nodes())
+    current_node_index = 0
+    # Creating the initial front layer.
+    front_layer = QuantumLayer()
+    current_node_index = update_layer(
+        front_layer, topological_nodes, current_node_index
+    )
+
+    swap_distance_matrix = get_distance_matrix_swap_number(hardware)
+
+    # Start of the iterative algorithm
+    while not front_layer.is_empty():
+        execute_gate_list = QuantumLayer()
+        for op in front_layer.ops:
+            if hardware.can_natively_execute_operation(op, current_mapping):
+                execute_gate_list.add_operation(op)
+                # Delaying the remove operation because we do not want to remove from
+                # a container we are iterating on.
+                # front_layer.remove_operation(op)
+        if not execute_gate_list.is_empty():
+            front_layer.remove_operations_from_layer(execute_gate_list)
+            execute_gate_list.apply_back_to_dag_circuit(
+                resulting_dag_quantum_circuit, initial_mapping, current_mapping
+            )
+            # Empty the explored mappings because at least one gate has been executed.
+            explored_mappings.clear()
+        else:
+            # We cannot execute any gate, that means that we should insert at least
+            # one SWAP/Bridge to make some gates executable.
+            # First list all the SWAPs/Bridges that may help us make some gates
+            # executable.
+            swap_candidates = get_candidates(
+                front_layer, hardware, current_mapping, explored_mappings
+            )
+            # Then rank the SWAPs/Bridge and take the best one.
+            best_swap_qubits = None
+            best_cost = float("inf")
+            best_effect = 0.0
+            for potential_swap in swap_candidates:
+                cost, swap_effect = swap_cost_and_effect_heuristic(
+                    hardware,
+                    front_layer,
+                    topological_nodes,
+                    current_node_index,
+                    current_mapping,
+                    distance_matrix,
+                    potential_swap,
+                )
+                if cost < best_cost:
+                    best_cost = cost
+                    best_effect = swap_effect
+                    best_swap_qubits = potential_swap
+            # We now have our best SWAP, let's check if a Bridge is not better
+            best_gate = best_swap_qubits
+            if (
+                best_effect < 0
+                and swap_distance_matrix[best_swap_qubits.left][best_swap_qubits.right]
+                == 2
+            ):
+                i, j = best_swap_qubits
+                common_neighbours = set(hardware.neighbors(i)) & set(
+                    hardware.neighbors(j)
+                )
+                if len(common_neighbours) < 1:
+                    raise RuntimeError("Less than one common neighbour")
+                common_neighbour = list(common_neighbours)[0]
+                best_gate = BridgeTwoQubitGate(i, common_neighbour, j)
+            current_mapping = best_gate.update_mapping(current_mapping)
+            explored_mappings.add(mapping_to_str(current_mapping))
+            best_gate.apply(resulting_dag_quantum_circuit, front_layer)
         # Anyway, update the current front_layer
         current_node_index = update_layer(
             front_layer, topological_nodes, current_node_index
