@@ -71,10 +71,10 @@ This function takes as parameter:
 
 ## Notes on the implementation
 
-The implementation presented here uses a slightly different method to chose between inserting a `SWAP` or a `Bridge` gate.
+The default implementation `ha_mapping` uses a slightly different method to chose between inserting a `SWAP` or a `Bridge` gate.
 The algorithm described in the scientific paper first computes the best `SWAP` and then determine if it is worth changing the `SWAP` into a `Bridge` gate.
-The implementation in this repository evaluates `Bridge` gates along `SWAP` ones, and pick the best gate according to the internal metric.
-A switch or a new method will be added to use the exact algorithm explained in the paper in a few days.
+The `hamap.ha_mapping` function in this repository evaluates `Bridge` gates along `SWAP` ones, and pick the best gate according to the internal metric.
+An implementation of the algorithm described in paper is given in `hamap.ha_mapping_paper_compliant`.
 
 
 
