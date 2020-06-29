@@ -46,7 +46,6 @@ setup(
         "numpy",
         "qiskit-terra",
         "qiskit-ibmq-provider",
-        "solidpy @ git+https://github.com/100/Solid.git",
     ],  # Optional
     entry_points={
         "console_scripts": [
