@@ -37,11 +37,11 @@ setup(
     version="0.0.1a",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    url="",
+    url="https://github.com/peachnuts/HA/",
     license="CeCILL-B",
     author="Nelimee",
     author_email="adrien.suau@lirmm.fr",
-    description="",
+    description="Implementation of an hardware-aware qubit mapping algorithm",
     install_requires=[
         "numpy",
         "qiskit-terra",
