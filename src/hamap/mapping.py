@@ -63,7 +63,9 @@ def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit
 def _adapt_quantum_circuit_arity(
     circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture
 ) -> None:
-    circuit.add_register(QuantumRegister(hardware.qubit_number - circuit.n_qubits))
+    missing_qubits = hardware.qubit_number - circuit.n_qubits
+    if missing_qubits > 0:
+        circuit.add_register(QuantumRegister(missing_qubits))
 
 
 def ha_mapping(
