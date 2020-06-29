@@ -36,7 +36,7 @@ import typing as ty
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 
-logger = logging.getLogger("qubit_mapping_optimizer.layer")
+logger = logging.getLogger("hamap.layer")
 
 
 class QuantumLayer:

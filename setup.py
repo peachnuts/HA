@@ -33,7 +33,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="qubit_mapping_optimizer",
+    name="hamap",
     version="0.0.1a",
     packages=find_packages("src"),
     package_dir={"": "src"},
@@ -50,11 +50,11 @@ setup(
     ],  # Optional
     entry_points={
         "console_scripts": [
-            "compare_initial_mappings=qubit_mapping_optimizer._cli"
+            "compare_initial_mappings=hamap._cli"
             ".initial_mappings_compare:main",
-            "compare_initial_mappings_our=qubit_mapping_optimizer._cli"
+            "compare_initial_mappings_our=hamap._cli"
             ".initial_mappings_compare_our:main",
-            "compare_swap_bridge=qubit_mapping_optimizer._cli.compare_swap_bridge:main",
+            "compare_swap_bridge=hamap._cli.compare_swap_bridge:main",
         ]
     },
 )
