@@ -88,7 +88,7 @@ def iterative_mapping_algorithm(
     ] = get_all_swap_bridge_candidates,
     get_distance_matrix: ty.Callable[
         [IBMQHardwareArchitecture], numpy.ndarray
-    ] = get_distance_matrix_swap_number_and_error,
+    ] = get_distance_matrix_swap_number,
 ) -> ty.Tuple[QuantumCircuit, ty.Dict[Qubit, int]]:
     """Map the given quantum circuit to the hardware topology provided.
 
