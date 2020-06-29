@@ -43,7 +43,7 @@ from hamap.initial_mapping import (
     get_random_mapping,
     initial_mapping_from_iterative_forward_backward,
 )
-from hamap.mapping import iterative_mapping_algorithm
+from hamap.mapping import ha_mapping
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:
@@ -59,7 +59,7 @@ def mapping_algorithm(
     hardware: IBMQHardwareArchitecture,
     mapping: ty.Dict[Qubit, int],
 ):
-    return iterative_mapping_algorithm(quantum_circuit, mapping, hardware)
+    return ha_mapping(quantum_circuit, mapping, hardware)
 
 
 def test_iterated_sabre(

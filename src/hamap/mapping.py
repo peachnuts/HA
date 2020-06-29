@@ -66,7 +66,7 @@ def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit
     return result
 
 
-def iterative_mapping_algorithm(
+def ha_mapping(
     quantum_circuit: QuantumCircuit,
     initial_mapping: ty.Dict[Qubit, int],
     hardware: IBMQHardwareArchitecture,

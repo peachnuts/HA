@@ -59,7 +59,7 @@ from hamap.initial_mapping import (
     _hardware_aware_reset,
     _random_shuffle,
 )
-from hamap.mapping import iterative_mapping_algorithm
+from hamap.mapping import ha_mapping
 
 import sys
 
@@ -223,7 +223,7 @@ def mapping_algorithm(quantum_circuit: QuantumCircuit, hardware, initial_mapping
 
 
 def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture):
-    mapped_circuit, final_mapping = iterative_mapping_algorithm(
+    mapped_circuit, final_mapping = ha_mapping(
         circuit, mapping, hardware
     )
     count = mapped_circuit.count_ops()

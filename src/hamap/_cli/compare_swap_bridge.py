@@ -58,7 +58,7 @@ from hamap.distance_matrix import (
     get_distance_matrix_error_cost,
     get_distance_matrix_swap_number,
 )
-from hamap.mapping import iterative_mapping_algorithm
+from hamap.mapping import ha_mapping
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:
@@ -75,7 +75,7 @@ def using_only_swap_strategy(
     mapping: ty.Dict[Qubit, int],
 ):
     start = now()
-    modified_circuit, _ = iterative_mapping_algorithm(
+    modified_circuit, _ = ha_mapping(
         circuit,
         mapping,
         hardware,
@@ -101,7 +101,7 @@ def using_swap_and_bridge_strategy(
     mapping: ty.Dict[Qubit, int],
 ):
     start = now()
-    modified_circuit, _ = iterative_mapping_algorithm(
+    modified_circuit, _ = ha_mapping(
         circuit,
         mapping,
         hardware,

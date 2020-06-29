@@ -57,7 +57,7 @@ from hamap.initial_mapping import (
     get_neighbour_random,
     get_random_mapping,
 )
-from hamap.mapping import iterative_mapping_algorithm
+from hamap.mapping import ha_mapping
 
 
 def _seed_random():
@@ -95,7 +95,7 @@ def random_strategy_results(
                 circuit.qubits, permutation(range(hardware.qubit_number))
             )
         }
-        modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+        modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
         op_count = modified_circuit.count_ops()
         best_random_cnot_number = min(
             best_random_cnot_number, 3 * op_count.get("swap", 0) + op_count.get("cx", 0)
@@ -109,7 +109,7 @@ def random_strategy_results(
 def wrap_iterative_mapping_algorithm(
     quantum_circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture, mapping,
 ):
-    return iterative_mapping_algorithm(quantum_circuit, mapping, hardware)
+    return ha_mapping(quantum_circuit, mapping, hardware)
 
 
 def sabre_strategy_results(
@@ -127,7 +127,7 @@ def sabre_strategy_results(
         initial_mapping = initial_mapping_from_sabre(
             circuit, hardware, wrap_iterative_mapping_algorithm
         )
-        modified_circuit, _ = iterative_mapping_algorithm(
+        modified_circuit, _ = ha_mapping(
             circuit, initial_mapping, hardware
         )
         op_count = modified_circuit.count_ops()
@@ -144,7 +144,7 @@ def sabre_strategy_results(
 
 
 def get_mapping_cost(mapping, quantum_circuit, hardware) -> float:
-    mapped_quantum_circuit, _ = iterative_mapping_algorithm(
+    mapped_quantum_circuit, _ = ha_mapping(
         quantum_circuit, mapping, hardware
     )
     return mapped_quantum_circuit.size() - quantum_circuit.size()
@@ -165,7 +165,7 @@ def annealing_strategy_results(
         temp_begin=1.0,
         schedule_func=lambda t: 10 ** (-6 / (allowed_calls_to_mapping - 1)) * t,
     )
-    modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+    modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
     op_count = modified_circuit.count_ops()
     return 3 * op_count.get("swap", 0) + op_count.get("cx", 0), now() - start
 
@@ -192,7 +192,7 @@ def annealing_sabre_strategy_results(
             temp_begin=1.0,
             schedule_func=lambda t: 10 ** (-6 / n) * t,
         )
-    modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+    modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
     op_count = modified_circuit.count_ops()
     return 3 * op_count.get("swap", 0) + op_count.get("cx", 0), now() - start
 
@@ -220,7 +220,7 @@ def forward_backward_strategy_results(
             ),
         )
         mapping_procedure_calls += nbcalls
-        modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+        modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
         op_count = modified_circuit.count_ops()
         best_cnot_number = min(
             best_cnot_number, 3 * op_count.get("swap", 0) + op_count.get("cx", 0)
@@ -252,7 +252,7 @@ def forward_backward_annealing_strategy_results(
             temp_begin=1.0,
             schedule_func=lambda t: 10 ** (-6 / n) * t,
         )
-    modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+    modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
     op_count = modified_circuit.count_ops()
     return 3 * op_count.get("swap", 0) + op_count.get("cx", 0), now() - start
 
@@ -275,7 +275,7 @@ def forward_backward_neighbour_strategy_results(
             initial_mapping=mapping,
         )
         allowed_calls_to_mapping -= nbcalls
-        modified_circuit, _ = iterative_mapping_algorithm(circuit, mapping, hardware)
+        modified_circuit, _ = ha_mapping(circuit, mapping, hardware)
         op_count = modified_circuit.count_ops()
         cnots.append(3 * op_count.get("swap", 0) + op_count.get("cx", 0))
         mapping = get_neighbour_random(mapping)

@@ -59,7 +59,7 @@ from hamap.initial_mapping import (
     _hardware_aware_reset,
     _random_shuffle,
 )
-from hamap.mapping import iterative_mapping_algorithm
+from hamap.mapping import ha_mapping
 
 
 def _seed_random():
@@ -112,7 +112,7 @@ def print_statistics(result_type: str, results, timings):
 
 
 def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture):
-    mapped_circuit, final_mapping = iterative_mapping_algorithm(
+    mapped_circuit, final_mapping = ha_mapping(
         circuit, mapping, hardware
     )
     count = mapped_circuit.count_ops()
@@ -126,7 +126,7 @@ def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchit
 
 
 def mapping_algorithm(circuit, hardware, mapping):
-    return iterative_mapping_algorithm(circuit, mapping, hardware)
+    return ha_mapping(circuit, mapping, hardware)
 
 
 def random_tuple_strategy_results(tup):

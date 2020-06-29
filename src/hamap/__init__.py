@@ -31,5 +31,5 @@
 # ======================================================================
 
 from .mapping_to_str import mapping_to_str
-from .mapping import iterative_mapping_algorithm
+from .mapping import ha_mapping
 from .hardware import IBMQHardwareArchitecture

@@ -17,7 +17,7 @@ python -m pip install HA
 from qiskit import QuantumCircuit
 
 from hamap import (
-    iterative_mapping_algorithm,
+    ha_mapping,
     IBMQHardwareArchitecture,
 )
 
@@ -33,7 +33,7 @@ initial_mapping = {qubit: i for i, qubit in enumerate(circuit.qubits)}
 # Map the circuit with SABRE heuristic, with a distance that is computed as the number
 # of SWAPs needed to make the two involved qubits able to communicate and by considering
 # SWAP **and** Bridge gates.
-mapped_circuit, final_mapping = iterative_mapping_algorithm(
+mapped_circuit, final_mapping = ha_mapping(
     circuit, initial_mapping, hardware
 )
 
@@ -42,7 +42,7 @@ print(mapped_circuit.draw())
 
 ## How to use?
 
-The main function that should be the entry point for any user is [`hamap.iterative_mapping_algorithm`](https://github.com/peachnuts/HA/blob/master/src/hamap/mapping.py#L69).
+The main function that should be the entry point for any user is [`hamap.ha_mapping`](https://github.com/peachnuts/HA/blob/master/src/hamap/mapping.py#L69).
 This function takes as parameter:
 
 1. An instance of `qiskit.QuantumCircuit` representing the circuit to map.
