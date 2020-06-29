@@ -32,15 +32,18 @@
 
 import argparse
 import itertools
-import pickle
-import sys
-import typing as ty
 from concurrent.futures import ProcessPoolExecutor
-from copy import deepcopy
 from multiprocessing import cpu_count
+from pathlib import Path
+from time import time as now
+import pickle
+import typing as ty
+import random
+from copy import deepcopy
 
 import numpy
 from numpy.random import permutation
+from qiskit import QuantumCircuit
 
 from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
 from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
@@ -58,8 +61,10 @@ from qubit_mapping_optimizer.initial_mapping import (
 )
 from qubit_mapping_optimizer.mapping import iterative_mapping_algorithm
 
+import sys
+
 sys.path.append(
-    "/home/siyuan/Seafile/Qubit mapping problem bibliography/SABRE/sabre_dynamic_test/"
+    "/home/suau/Seafile/Qubit mapping problem bibliography/SABRE/sabre_dynamic_test/"
 )
 
 from sabre_distance_bridge import chips
@@ -99,7 +104,6 @@ def _argmin(l: ty.Iterable) -> int:
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:
-    print(Path(__file__))
     src_folder = Path(__file__).parent.parent.parent
     benchmark_folder = src_folder.parent / "benchmark"
     return QuantumCircuit.from_qasm_file(
@@ -378,5 +382,3 @@ def main():
         f"results-{N}-{Nstep}-{M}-{args.circuit_name}-{args.hardware}.pkl", "wb"
     ) as f:
         pickle.dump(results, f)
-
-main()
