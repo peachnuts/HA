@@ -54,7 +54,7 @@ from qubit_mapping_optimizer.swap import (
     get_all_swap_candidates,
     get_all_swap_bridge_candidates,
 )
-from qubit_mapping_optimizer._mapping_to_str import mapping_to_str
+from qubit_mapping_optimizer.mapping_to_str import mapping_to_str
 
 
 def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit:

@@ -45,7 +45,7 @@ from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
 from qubit_mapping_optimizer.layer import QuantumLayer
-from qubit_mapping_optimizer._mapping_to_str import mapping_to_str
+from qubit_mapping_optimizer.mapping_to_str import mapping_to_str
 
 logger = logging.getLogger("qubit_mapping_optimizer.swap")
 
