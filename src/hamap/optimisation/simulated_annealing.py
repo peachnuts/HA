@@ -36,7 +36,7 @@ from math import exp
 import random
 import logging
 
-logger = logging.getLogger("qubit_mapping_optimizer.optimisation.simulated_annealing")
+logger = logging.getLogger("hamap.optimisation.simulated_annealing")
 
 StateType = ty.NewType("StateType", ty.Any)
 

@@ -35,15 +35,15 @@ from pathlib import Path
 from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
 
-from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
-from qubit_mapping_optimizer.initial_mapping import (
+from hamap.initial_mapping import (
     get_random_mapping,
     initial_mapping_from_iterative_forward_backward,
 )
-from qubit_mapping_optimizer.mapping import iterative_mapping_algorithm
+from hamap.mapping import iterative_mapping_algorithm
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:

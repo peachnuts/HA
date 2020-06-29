@@ -32,7 +32,7 @@
 
 from qiskit import QuantumCircuit, QuantumRegister
 
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
 

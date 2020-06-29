@@ -43,12 +43,12 @@ from qiskit.extensions.standard.x import CnotGate
 
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 
-from qubit_mapping_optimizer.layer import QuantumLayer
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap.layer import QuantumLayer
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
 
-logger = logging.getLogger("qubit_mapping_optimizer.gates")
+logger = logging.getLogger("hamap.gates")
 
 
 class _BridgeGate(Gate):

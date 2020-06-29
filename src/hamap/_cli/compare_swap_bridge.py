@@ -44,21 +44,21 @@ from numpy.random import permutation
 from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
 
-from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
-from qubit_mapping_optimizer.heuristics import sabre_heuristic
+from hamap.heuristics import sabre_heuristic
 
-from qubit_mapping_optimizer.swap import (
+from hamap.swap import (
     get_all_swap_candidates,
     get_all_swap_bridge_candidates,
 )
-from qubit_mapping_optimizer.distance_matrix import (
+from hamap.distance_matrix import (
     get_distance_matrix_error_cost,
     get_distance_matrix_swap_number,
 )
-from qubit_mapping_optimizer.mapping import iterative_mapping_algorithm
+from hamap.mapping import iterative_mapping_algorithm
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:

@@ -46,18 +46,18 @@ import numpy
 from numpy.random import permutation
 from qiskit import QuantumCircuit
 
-from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
-from qubit_mapping_optimizer.initial_mapping import (
+from hamap.initial_mapping import (
     get_initial_mapping_from_annealing,
     initial_mapping_from_sabre,
     initial_mapping_from_iterative_forward_backward,
     get_neighbour_random,
     get_random_mapping,
 )
-from qubit_mapping_optimizer.mapping import iterative_mapping_algorithm
+from hamap.mapping import iterative_mapping_algorithm
 
 
 def _seed_random():

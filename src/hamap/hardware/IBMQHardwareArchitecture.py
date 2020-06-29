@@ -41,7 +41,7 @@ from qiskit.dagcircuit.dagcircuit import DAGNode
 
 from .HardwareArchitecture import HardwareArchitecture
 
-logger = logging.getLogger("qubit_mapping_optimizer.IBMQHardwareArchitecture")
+logger = logging.getLogger("hamap.IBMQHardwareArchitecture")
 
 
 def cnot_execution_time_function(vertex, hardware):

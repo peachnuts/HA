@@ -39,11 +39,11 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.converters import circuit_to_dag
 
-from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
-from qubit_mapping_optimizer.optimisation.simulated_annealing import simulated_annealing
+from hamap.optimisation.simulated_annealing import simulated_annealing
 
 
 def get_random_mapping(quantum_circuit: QuantumCircuit) -> ty.Dict[Qubit, int]:

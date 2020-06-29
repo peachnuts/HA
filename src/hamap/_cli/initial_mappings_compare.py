@@ -45,11 +45,11 @@ import numpy
 from numpy.random import permutation
 from qiskit import QuantumCircuit
 
-from qubit_mapping_optimizer._circuit_manipulation import add_qubits_to_quantum_circuit
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
-from qubit_mapping_optimizer.initial_mapping import (
+from hamap.initial_mapping import (
     get_best_mapping_from_annealing,
     get_best_mapping_from_iterative_forward_backward,
     get_best_mapping_sabre,
@@ -59,39 +59,7 @@ from qubit_mapping_optimizer.initial_mapping import (
     _hardware_aware_reset,
     _random_shuffle,
 )
-from qubit_mapping_optimizer.mapping import iterative_mapping_algorithm
-
-import sys
-
-sys.path.append(
-    "/home/suau/Seafile/Qubit mapping problem bibliography/SABRE/sabre_dynamic_test/"
-)
-
-from sabre_distance_bridge import chips
-import random
-from sabre_distance_bridge import utils
-from sabre_distance_bridge.mapping import (
-    one_round_optimization,
-    output_context,
-)
-
-from pathlib import Path
-from qiskit import QuantumCircuit
-import numpy as np
-
-from sabre_distance_bridge.distance_matrix import (
-    get_distance_matrix_swap_number,
-    get_distance_matrix_error_cost,
-    get_distance_matrix_execution_time_cost,
-)
-
-qx2 = chips.ibmqx2()
-q20 = chips.ibmq20()
-q_almaden = chips.ibmq20Almaden()
-qx5 = chips.ibmq5()
-q53 = chips.ibmq53()
-
-chip = q20
+from hamap.mapping import iterative_mapping_algorithm
 
 
 def _seed_random():
@@ -143,103 +111,26 @@ def print_statistics(result_type: str, results, timings):
     )
 
 
-def mapping_algorithm(quantum_circuit: QuantumCircuit, hardware, initial_mapping):
-    # 1. Compute distance matrices
-    distance_matrix_error_cost = get_distance_matrix_error_cost(hardware)
-    distance_matrix_execution_time_cost = get_distance_matrix_execution_time_cost(
-        hardware
-    )
-    distance_matrix_swap_number = get_distance_matrix_swap_number(hardware)
-
-    norm_error_cost = np.linalg.norm(distance_matrix_error_cost)
-    norm_execution_time_cost = np.linalg.norm(distance_matrix_execution_time_cost)
-    norm_swap_number_cost = np.linalg.norm(distance_matrix_swap_number)
-
-    distance_matrix_error_cost_norm = distance_matrix_error_cost / norm_error_cost
-    distance_matrix_execution_time_cost_norm = (
-        distance_matrix_execution_time_cost / norm_execution_time_cost
-    )
-    distance_matrix_swap_number_norm = (
-        distance_matrix_swap_number / norm_swap_number_cost
-    )
-    distance_mat = (
-        0.5 * distance_matrix_error_cost_norm
-        + 0 * distance_matrix_execution_time_cost_norm
-        + 0.5 * distance_matrix_swap_number_norm
-    )
-
-    # 2. Write the quantum to a QASM file
-    with open("filename.qasm", "w") as f:
-        f.write(quantum_circuit.qasm())
-
-    # 3. Re-open the QASM file for SABRE structures
-    filename = "decod24-v2_43.qasm"
-    (
-        qubit_num,
-        gate_type,
-        gate_qubit,
-        cx_gate_num,
-        cx_gates,
-        context,
-    ) = utils.read_flatten_qasm(
-        str(Path(__file__).parent.parent)
-        + "/sabre_dynamic_test/sabre_distance_bridge/test/examples/"
-        + filename
-    )
-
-    # 4. Apply the mapping algorithm
-    # print('initial mapping ', initial_mapping)
-    if isinstance(initial_mapping, dict):
-        initial_mapping = [j for i, j in initial_mapping.items()]
-    # print('initial mapping ', initial2_mapping)
-    swap_num, bridge_num, final_mapping = one_round_optimization(
-        initial_mapping,
-        distance_mat,
-        distance_matrix_swap_number,
-        # get_distance_matrix_cnot_error_cost,
-        gate_qubit,
-        gate_type,
-        context,
-        chip.qubit_num,
-        cx_gate_num,
-        chip,
-    )
-
-    # Write the QASM from SABRE structure
-    output = str(Path(__file__).parent) + "/output/1.qasm"
-    with open(output, "w") as file_object:
-        file_object.write("OPENQASM 2.0;\n")
-        file_object.write('include "qelib1.inc";\n')
-        file_object.write("qreg q[" + str(chip.qubit_num) + "];\n")
-        file_object.write("creg c[" + str(chip.qubit_num) + "];\n")
-        for line_idx in output_context:
-            file_object.write(line_idx)
-
-    # 5. QuantumCircuit from the QASM
-    mapped_quantum_circuit = QuantumCircuit.from_qasm_file(output)
-    mapped_quantum_circuit = QuantumCircuit.from_qasm_file(output)
-    # print(mapped_quantum_circuit.count_ops())
-    return mapped_quantum_circuit, final_mapping
-
-
 def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture):
     mapped_circuit, final_mapping = iterative_mapping_algorithm(
         circuit, mapping, hardware
     )
     count = mapped_circuit.count_ops()
-    return 3 * count.get("swap", 0) + count.get("cnot", 0) + 4 * count.get("bridge", 0)
-
-
-def cost(initial_mapping, quantum_circuit: QuantumCircuit, hardware):
-    mapped_circuit, final_mapping = mapping_algorithm(
-        quantum_circuit, hardware, initial_mapping
+    assert ("cx" in count) != ("cnot" in count)
+    return (
+        3 * count.get("swap", 0)
+        + count.get("cx", 0)
+        + count.get("cnot", 0)
+        + 4 * count.get("bridge", 0)
     )
-    ops = mapped_circuit.count_ops()
-    ops_num = ops.get("cx", 0) + ops.get("swap", 0) * 3 + ops.get("bridge", 0) * 4
-    return ops_num
+
+
+def mapping_algorithm(circuit, hardware, mapping):
+    return iterative_mapping_algorithm(circuit, mapping, hardware)
 
 
 def random_tuple_strategy_results(tup):
+    _seed_random()
     circuit, hardware, max_allowed_eval = tup
     mapping = get_best_mapping_random(
         circuit, cost_function, hardware, max_allowed_eval,
@@ -248,6 +139,7 @@ def random_tuple_strategy_results(tup):
 
 
 def sabre_tuple_strategy_results(tup):
+    _seed_random()
     circuit, hardware, max_allowed_eval = tup
     mapping = get_best_mapping_sabre(
         circuit, mapping_algorithm, cost_function, hardware, max_allowed_eval
@@ -255,22 +147,17 @@ def sabre_tuple_strategy_results(tup):
     return cost_function(mapping, circuit, hardware)
 
 
-def iterated_tuple_strategy_results(tup):
+def annealing_random_tuple_strategy_results(tup):
+    _seed_random()
     circuit, hardware, max_allowed_eval = tup
-    mapping = get_best_mapping_from_iterative_forward_backward(
-        circuit, hardware, mapping_algorithm, cost_function, max_allowed_eval
+    mapping = get_best_mapping_from_annealing(
+        circuit, hardware, cost_function, max_allowed_eval
     )
     return cost_function(mapping, circuit, hardware)
 
 
-def annealing_random_tuple_strategy_results(tup):
-    circuit, hardware, max_allowed_eval = tup
-    return get_best_mapping_from_annealing(
-        circuit, hardware, cost_function, max_allowed_eval
-    )
-
-
 def annealing_hardware_aware_tuple_strategy_results(tup):
+    _seed_random()
     circuit, hardware, max_allowed_eval = tup
     p1, p2 = 0.9, 0.08
     mapping = get_best_mapping_from_annealing(
@@ -349,14 +236,6 @@ def main():
                 )
             )
 
-            print("\tForward-backward...")
-            best_forward_backward_results = list(
-                executor.map(
-                    iterated_tuple_strategy_results,
-                    itertools.repeat([circuit, hardware, n], M),
-                )
-            )
-
             print("\tAnnealing hardware...")
             best_annealing_hardware_results = list(
                 executor.map(
@@ -371,7 +250,6 @@ def main():
                     "results": deepcopy(best_annealing_random_results)
                 },
                 "sabre": {"results": deepcopy(best_sabre_results)},
-                "iterated": {"results": deepcopy(best_forward_backward_results)},
                 "annealing_hardware": {
                     "results": deepcopy(best_annealing_hardware_results)
                 },
