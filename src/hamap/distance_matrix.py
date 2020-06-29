@@ -35,7 +35,7 @@ from functools import partial
 import networkx as nx
 import numpy
 
-from qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture import (
+from hamap.hardware.IBMQHardwareArchitecture import (
     IBMQHardwareArchitecture,
 )
 
