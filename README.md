@@ -13,14 +13,14 @@ python -m pip install HA
 
 ## How to use?
 
-The main function that should be the entry point for any user is [`qubit_mapping_optimizer.mapping.iterative_mapping_algorithm`](https://github.com/peachnuts/HA/blob/master/src/qubit_mapping_optimizer/mapping.py#L69).
+The main function that should be the entry point for any user is [`qubit_mapping_optimizer.iterative_mapping_algorithm`](https://github.com/peachnuts/HA/blob/master/src/qubit_mapping_optimizer/mapping.py#L69).
 This function takes as parameter:
 
 1. An instance of `qiskit.QuantumCircuit` representing the circuit to map.
 2. An initial mapping, given as a dictionnary that maps the instances of `qiskit.Qubit` contained in the quantum circuit given as first parameter to the physical qubit identifier, i.e. an integer representing a physical qubit on the hardware we map the circuit to.
-3. An instance of `qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture.IBMQHardwareArchitecture` that wraps Qiskit's API to retrieve calibration data and hardware information.
+3. An instance of `qubit_mapping_optimizer.IBMQHardwareArchitecture` that wraps Qiskit's API to retrieve calibration data and hardware information.
 4. A function `swap_cost_heuristic` that takes as parameters
-   1. An instance of `qubit_mapping_optimizer.hardware.IBMQHardwareArchitecture.IBMQHardwareArchitecture`.
+   1. An instance of `qubit_mapping_optimizer.IBMQHardwareArchitecture`.
    2. An instance of `qubit_mapping_optimizer.layer.QuantumLayer` representing the current "first layer".
    3. A list of `qiskit.dagcircuit.dagcircuit.DAGNode` that contains the nodes of the `DAGCircuit` (i.e. quantum gates) that are not mapped yet, sorted in a topological order (i.e. the first node is guaranteed to to have all its predecessors already mapped).
    4. The index of the current "first" gate, i.e. the first gate of the `DAGNode` list that have not already been mapped.
