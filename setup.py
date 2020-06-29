@@ -50,8 +50,7 @@ setup(
     ],  # Optional
     entry_points={
         "console_scripts": [
-            "compare_initial_mappings=hamap._cli"
-            ".initial_mappings_compare:main",
+            "compare_initial_mappings=hamap._cli" ".initial_mappings_compare:main",
             "compare_initial_mappings_our=hamap._cli"
             ".initial_mappings_compare_our:main",
             "compare_swap_bridge=hamap._cli.compare_swap_bridge:main",
