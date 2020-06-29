@@ -32,26 +32,22 @@
 
 import argparse
 import itertools
+import pickle
+import random
+import typing as ty
 from concurrent.futures import ProcessPoolExecutor
+from copy import deepcopy
 from multiprocessing import cpu_count
 from pathlib import Path
-from time import time as now
-import pickle
-import typing as ty
-import random
-from copy import deepcopy
 
 import numpy
 from numpy.random import permutation
 from qiskit import QuantumCircuit
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.initial_mapping import (
     get_best_mapping_from_annealing,
-    get_best_mapping_from_iterative_forward_backward,
     get_best_mapping_sabre,
     get_best_mapping_random,
     _random_execution_policy,
@@ -112,9 +108,7 @@ def print_statistics(result_type: str, results, timings):
 
 
 def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture):
-    mapped_circuit, final_mapping = ha_mapping(
-        circuit, mapping, hardware
-    )
+    mapped_circuit, final_mapping = ha_mapping(circuit, mapping, hardware)
     count = mapped_circuit.count_ops()
     assert ("cx" in count) != ("cnot" in count)
     return (

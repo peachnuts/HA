@@ -32,9 +32,7 @@
 
 from qiskit import QuantumCircuit, QuantumRegister
 
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 
 
 def add_qubits_to_quantum_circuit(

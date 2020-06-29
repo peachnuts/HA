@@ -30,6 +30,6 @@
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
 
-from .mapping_to_str import mapping_to_str
-from .mapping import ha_mapping
 from .hardware import IBMQHardwareArchitecture
+from .mapping import ha_mapping
+from .mapping_to_str import mapping_to_str

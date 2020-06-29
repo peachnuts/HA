@@ -36,9 +36,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.initial_mapping import (
     get_random_mapping,
     initial_mapping_from_iterative_forward_backward,

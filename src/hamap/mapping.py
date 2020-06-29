@@ -38,24 +38,14 @@ from qiskit.circuit.quantumregister import Qubit
 from qiskit.converters.circuit_to_dag import circuit_to_dag
 from qiskit.converters.dag_to_circuit import dag_to_circuit
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
-from qiskit.extensions.standard.swap import SwapGate
 
-from hamap.distance_matrix import (
-    get_distance_matrix_swap_number,
-    get_distance_matrix_swap_number_and_error,
-    get_distance_matrix_mixed
-)
+from hamap.distance_matrix import get_distance_matrix_mixed
 from hamap.gates import TwoQubitGate
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.heuristics import sabre_heuristic
 from hamap.layer import QuantumLayer, update_layer
-from hamap.swap import (
-    get_all_swap_candidates,
-    get_all_swap_bridge_candidates,
-)
 from hamap.mapping_to_str import mapping_to_str
+from hamap.swap import get_all_swap_bridge_candidates
 
 
 def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit:

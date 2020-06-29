@@ -30,8 +30,8 @@
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
 
-import typing as ty
 import logging
+import typing as ty
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
@@ -41,9 +41,7 @@ from hamap.gates import (
     SwapTwoQubitGate,
     BridgeTwoQubitGate,
 )
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.layer import QuantumLayer
 from hamap.mapping_to_str import mapping_to_str
 

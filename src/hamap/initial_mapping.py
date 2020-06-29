@@ -29,9 +29,9 @@
 # The fact that you  are presently reading this  means that you have had
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
+import math
 import random
 import typing as ty
-import math
 from copy import copy
 
 import numpy
@@ -40,9 +40,7 @@ from qiskit.circuit.quantumregister import Qubit
 from qiskit.converters import circuit_to_dag
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.optimisation.simulated_annealing import simulated_annealing
 
 

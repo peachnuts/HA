@@ -32,16 +32,13 @@
 
 import logging
 import typing as ty
-from copy import deepcopy
 
 import numpy
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGNode
 
 from hamap.gates import TwoQubitGate
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.layer import QuantumLayer, update_layer
 
 logger = logging.getLogger("hamap.heuristics")

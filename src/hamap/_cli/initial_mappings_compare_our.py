@@ -32,23 +32,18 @@
 
 import argparse
 import itertools
-from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import cpu_count
-from pathlib import Path
-from time import time as now
 import pickle
+import sys
 import typing as ty
-import random
+from concurrent.futures import ProcessPoolExecutor
 from copy import deepcopy
+from multiprocessing import cpu_count
 
 import numpy
 from numpy.random import permutation
-from qiskit import QuantumCircuit
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.initial_mapping import (
     get_best_mapping_from_annealing,
     get_best_mapping_from_iterative_forward_backward,
@@ -60,8 +55,6 @@ from hamap.initial_mapping import (
     _random_shuffle,
 )
 from hamap.mapping import ha_mapping
-
-import sys
 
 sys.path.append(
     "/home/suau/Seafile/Qubit mapping problem bibliography/SABRE/sabre_dynamic_test/"
@@ -223,9 +216,7 @@ def mapping_algorithm(quantum_circuit: QuantumCircuit, hardware, initial_mapping
 
 
 def cost_function(mapping, circuit: QuantumCircuit, hardware: IBMQHardwareArchitecture):
-    mapped_circuit, final_mapping = ha_mapping(
-        circuit, mapping, hardware
-    )
+    mapped_circuit, final_mapping = ha_mapping(circuit, mapping, hardware)
     count = mapped_circuit.count_ops()
     return 3 * count.get("swap", 0) + count.get("cnot", 0) + 4 * count.get("bridge", 0)
 

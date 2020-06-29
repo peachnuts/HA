@@ -31,9 +31,8 @@
 # ======================================================================
 
 import argparse
-import typing as ty
 import itertools
-
+import typing as ty
 from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import cpu_count
 from pathlib import Path
@@ -45,20 +44,14 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.quantumregister import Qubit
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.distance_matrix import get_distance_matrix_swap_number
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.heuristics import sabre_heuristic
-
+from hamap.mapping import ha_mapping
 from hamap.swap import (
     get_all_swap_candidates,
     get_all_swap_bridge_candidates,
 )
-from hamap.distance_matrix import (
-    get_distance_matrix_error_cost,
-    get_distance_matrix_swap_number,
-)
-from hamap.mapping import ha_mapping
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:

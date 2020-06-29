@@ -30,23 +30,19 @@
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
 
+import logging
 import typing as ty
 from copy import copy
-import logging
 
 import numpy
-
-from qiskit.circuit.quantumregister import Qubit
 from qiskit.circuit import Gate, QuantumRegister
+from qiskit.circuit.quantumregister import Qubit
+from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 from qiskit.extensions.standard.swap import SwapGate
 from qiskit.extensions.standard.x import CnotGate
 
-from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
-
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.layer import QuantumLayer
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
 
 logger = logging.getLogger("hamap.gates")
 

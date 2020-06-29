@@ -35,9 +35,7 @@ from functools import partial
 import networkx as nx
 import numpy
 
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 
 
 def _get_swap_number(*_) -> float:

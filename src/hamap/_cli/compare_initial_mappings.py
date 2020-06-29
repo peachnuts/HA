@@ -32,24 +32,21 @@
 
 import argparse
 import itertools
+import pickle
+import random
+import typing as ty
 from concurrent.futures import ProcessPoolExecutor
+from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
 from time import time as now
-import pickle
-import typing as ty
-import random
-from math import ceil
-from copy import deepcopy
 
 import numpy
 from numpy.random import permutation
 from qiskit import QuantumCircuit
 
 from hamap._circuit_manipulation import add_qubits_to_quantum_circuit
-from hamap.hardware.IBMQHardwareArchitecture import (
-    IBMQHardwareArchitecture,
-)
+from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.initial_mapping import (
     get_initial_mapping_from_annealing,
     initial_mapping_from_sabre,
@@ -127,9 +124,7 @@ def sabre_strategy_results(
         initial_mapping = initial_mapping_from_sabre(
             circuit, hardware, wrap_iterative_mapping_algorithm
         )
-        modified_circuit, _ = ha_mapping(
-            circuit, initial_mapping, hardware
-        )
+        modified_circuit, _ = ha_mapping(circuit, initial_mapping, hardware)
         op_count = modified_circuit.count_ops()
         best_random_cnot_number = min(
             best_random_cnot_number, 3 * op_count.get("swap", 0) + op_count.get("cx", 0)
@@ -144,9 +139,7 @@ def sabre_strategy_results(
 
 
 def get_mapping_cost(mapping, quantum_circuit, hardware) -> float:
-    mapped_quantum_circuit, _ = ha_mapping(
-        quantum_circuit, mapping, hardware
-    )
+    mapped_quantum_circuit, _ = ha_mapping(quantum_circuit, mapping, hardware)
     return mapped_quantum_circuit.size() - quantum_circuit.size()
 
 

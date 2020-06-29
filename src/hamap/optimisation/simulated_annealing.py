@@ -30,11 +30,11 @@
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
 
+import logging
+import random
 import typing as ty
 from copy import deepcopy
 from math import exp
-import random
-import logging
 
 logger = logging.getLogger("hamap.optimisation.simulated_annealing")
 
