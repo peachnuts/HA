@@ -46,6 +46,7 @@ setup(
         "numpy",
         "qiskit-terra",
         "qiskit-ibmq-provider",
+        "networkx",
     ],  # Optional
     entry_points={
         "console_scripts": [
