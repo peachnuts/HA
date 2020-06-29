@@ -240,7 +240,7 @@ def ha_mapping_paper_compliant(
     :return: The final circuit along with the mapping obtained at the end of the
         iterative procedure.
     """
-    _adapt_quantum_circuit_and_mapping_arity(quantum_circuit, hardware)
+    _adapt_quantum_circuit_and_mapping_arity(quantum_circuit, initial_mapping, hardware)
     # Creating the internal data structures that will be used in this function.
     dag_circuit = circuit_to_dag(quantum_circuit)
     distance_matrix = get_distance_matrix(hardware)
