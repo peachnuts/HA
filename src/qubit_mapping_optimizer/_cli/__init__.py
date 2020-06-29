@@ -2,6 +2,7 @@
 # Copyright TOTAL / CERFACS / LIRMM (03/2020)
 # Contributor: Adrien Suau (<adrien.suau@cerfacs.fr>
 #                           <adrien.suau@lirmm.fr>)
+#              Siyuan Niu  (<siyuan.niu@lirmm.fr>)
 #
 # This software is governed by the CeCILL-B license under French law and
 # abiding  by the  rules of  distribution of free software. You can use,
