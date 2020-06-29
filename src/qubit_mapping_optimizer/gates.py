@@ -39,7 +39,7 @@ import numpy
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.circuit import Gate, QuantumRegister
 from qiskit.extensions.standard.swap import SwapGate
-from qiskit.extensions.standard.x import CXGate
+from qiskit.extensions.standard.x import CnotGate
 
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 
@@ -67,10 +67,10 @@ class _BridgeGate(Gate):
         definition = []
         q = QuantumRegister(3, "q")
         rule = [
-            (CXGate(), [q[0], q[1]], []),
-            (CXGate(), [q[1], q[2]], []),
-            (CXGate(), [q[0], q[1]], []),
-            (CXGate(), [q[1], q[2]], []),
+            (CnotGate(), [q[0], q[1]], []),
+            (CnotGate(), [q[1], q[2]], []),
+            (CnotGate(), [q[0], q[1]], []),
+            (CnotGate(), [q[1], q[2]], []),
         ]
         for inst in rule:
             definition.append(inst)
@@ -191,10 +191,10 @@ class BridgeTwoQubitGate(TwoQubitGate):
         return self._middle
 
     def apply(self, dag_circuit: DAGCircuit, front_layer: QuantumLayer):
-        dag_circuit.apply_operation_back(CXGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CXGate(), [self.middle, self.right])
-        dag_circuit.apply_operation_back(CXGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CXGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
         # dag_circuit.apply_operation_back(
         #     _BridgeGate(), [self.left, self.middle, self.right]
         # )
