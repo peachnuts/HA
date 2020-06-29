@@ -30,9 +30,7 @@ circuit.measure([0, 1], [0, 1])
 hardware = IBMQHardwareArchitecture("ibmq_16_melbourne")
 initial_mapping = {qubit: i for i, qubit in enumerate(circuit.qubits)}
 
-# Map the circuit with SABRE heuristic, with a distance that is computed as the number
-# of SWAPs needed to make the two involved qubits able to communicate and by considering
-# SWAP **and** Bridge gates.
+# Map the circuit with our hardware-aware heuristic and using SWAP & Bridge gates.
 mapped_circuit, final_mapping = ha_mapping(
     circuit, initial_mapping, hardware
 )

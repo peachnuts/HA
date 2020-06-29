@@ -43,6 +43,7 @@ from qiskit.extensions.standard.swap import SwapGate
 from hamap.distance_matrix import (
     get_distance_matrix_swap_number,
     get_distance_matrix_swap_number_and_error,
+    get_distance_matrix_mixed
 )
 from hamap.gates import TwoQubitGate
 from hamap.hardware.IBMQHardwareArchitecture import (
@@ -88,7 +89,7 @@ def ha_mapping(
     ] = get_all_swap_bridge_candidates,
     get_distance_matrix: ty.Callable[
         [IBMQHardwareArchitecture], numpy.ndarray
-    ] = get_distance_matrix_swap_number,
+    ] = lambda hardware: get_distance_matrix_mixed(hardware, 0.5, 0, 0.5),
 ) -> ty.Tuple[QuantumCircuit, ty.Dict[Qubit, int]]:
     """Map the given quantum circuit to the hardware topology provided.
 
