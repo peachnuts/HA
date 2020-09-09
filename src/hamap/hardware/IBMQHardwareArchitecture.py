@@ -58,7 +58,7 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
     @staticmethod
     def _get_value(value: float, unit: str):
         # We want time in nanoseconds
-        if unit == "µs":
+        if unit == "us":
             return value * 10 ** 3
         elif unit == "ns":
             return value

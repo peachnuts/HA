@@ -88,13 +88,15 @@ def ha_mapping(
             ty.List[DAGNode],  # Topologically sorted list of nodes
             int,  # Index of the first non-processed gate.
             ty.Dict[Qubit, int],  # The mapping before applying the tested SWAP/Bridge
+            ty.Dict[Qubit, int],  # The initial mapping
+            ty.Dict[Qubit, int],  # The trans mapping
             numpy.ndarray,  # The distance matrix between each qubits
             TwoQubitGate,  # The SWAP/Bridge we want to rank
         ],
         float,
     ] = sabre_heuristic,
     get_candidates: ty.Callable[
-        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Set[str],],
+        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Dict[Qubit, int], ty.Dict[Qubit, int], ty.Set[str],],
         ty.List[TwoQubitGate],
     ] = get_all_swap_bridge_candidates,
     get_distance_matrix: ty.Callable[
@@ -134,6 +136,7 @@ def ha_mapping(
     current_node_index = update_layer(
         front_layer, topological_nodes, current_node_index
     )
+    trans_mapping = initial_mapping.copy()
 
     # Start of the iterative algorithm
     while not front_layer.is_empty():
@@ -147,17 +150,18 @@ def ha_mapping(
         if not execute_gate_list.is_empty():
             front_layer.remove_operations_from_layer(execute_gate_list)
             execute_gate_list.apply_back_to_dag_circuit(
-                resulting_dag_quantum_circuit, initial_mapping, current_mapping
+                resulting_dag_quantum_circuit, initial_mapping, trans_mapping
             )
             # Empty the explored mappings because at least one gate has been executed.
             explored_mappings.clear()
         else:
+            inverse_mapping = {val: key for key, val in initial_mapping.items()}
             # We cannot execute any gate, that means that we should insert at least
             # one SWAP/Bridge to make some gates executable.
             # First list all the SWAPs/Bridges that may help us make some gates
             # executable.
             swap_candidates = get_candidates(
-                front_layer, hardware, current_mapping, explored_mappings
+                front_layer, hardware, initial_mapping, current_mapping, trans_mapping, explored_mappings
             )
             # Then rank the SWAPs/Bridge and take the best one.
             best_swap_qubits = None
@@ -169,6 +173,8 @@ def ha_mapping(
                     topological_nodes,
                     current_node_index,
                     current_mapping,
+                    initial_mapping,
+                    trans_mapping,
                     distance_matrix,
                     potential_swap,
                 )
@@ -177,8 +183,22 @@ def ha_mapping(
                     best_swap_qubits = potential_swap
             # We now have our best SWAP/Bridge, let's perform it!
             current_mapping = best_swap_qubits.update_mapping(current_mapping)
+            if isinstance(best_swap_qubits, SwapTwoQubitGate):
+                control, target = current_mapping[best_swap_qubits.left], current_mapping[best_swap_qubits.right]
+                swap_control, swap_target = inverse_mapping[control], inverse_mapping[target]
+                best_swap_qubits = SwapTwoQubitGate(
+                    swap_control, swap_target
+                )
+                print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
+                trans_mapping[best_swap_qubits.left], trans_mapping[best_swap_qubits.right] = (
+                    trans_mapping[best_swap_qubits.right],
+                    trans_mapping[best_swap_qubits.left],
+                )
+            else:
+                print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
+                pass
             explored_mappings.add(mapping_to_str(current_mapping))
-            best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer)
+            best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer, initial_mapping, trans_mapping)
         # Anyway, update the current front_layer
         current_node_index = update_layer(
             front_layer, topological_nodes, current_node_index
