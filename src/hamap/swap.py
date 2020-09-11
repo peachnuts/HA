@@ -82,12 +82,15 @@ def get_all_swap_candidates(
 def get_all_bridge_candidates(
     layer: QuantumLayer,
     hardware: IBMQHardwareArchitecture,
+    initial_mapping: ty.Dict[Qubit, int],
+    trans_mapping: ty.Dict[Qubit, int],
     current_mapping: ty.Dict[Qubit, int],
     explored_mappings: ty.Set[str],
 ) -> ty.List[BridgeTwoQubitGate]:
     all_bridges = []
 
-    inverse_mapping = {val: key for key, val in current_mapping.items()}
+    inverse_trans_mapping = {val: key for key, val in trans_mapping.items()}
+    inverse_mapping = {val: key for key, val in initial_mapping.items()}
     for op in layer.ops:
         if len(op.qargs) < 2:
             # We just pass 1 qubit gates because they do not participate in the
@@ -98,13 +101,16 @@ def get_all_bridge_candidates(
             continue
 
         control, target = op.qargs
-        control_index = current_mapping[control]
+        control_index = initial_mapping[inverse_trans_mapping[initial_mapping[control]]]
+        target_index = initial_mapping[inverse_trans_mapping[initial_mapping[target]]]
         # For each qubit q linked with control, check if target is linked with q.
         for _, potential_middle_index in hardware.out_edges(control_index):
             for _, potential_target_index in hardware.out_edges(potential_middle_index):
-                if inverse_mapping[potential_target_index] == target:
+                if potential_target_index == target_index:
                     two_qubit_gate = BridgeTwoQubitGate(
-                        control, inverse_mapping[potential_middle_index], target
+                        inverse_trans_mapping[initial_mapping[control]],
+                        inverse_mapping[potential_middle_index],
+                        inverse_trans_mapping[initial_mapping[target]],
                     )
                     # Check that the mapping has not already been explored in this
                     # SWAP-insertion pass.
@@ -119,14 +125,16 @@ def get_all_bridge_candidates(
 def get_all_swap_bridge_candidates(
     layer: QuantumLayer,
     hardware: IBMQHardwareArchitecture,
+    initial_mapping: ty.Dict[Qubit, int],
     current_mapping: ty.Dict[Qubit, int],
+    trans_mapping: ty.Dict[Qubit, int],
     explored_mappings: ty.Set[str],
 ) -> ty.List[TwoQubitGate]:
     swap_candidates = get_all_swap_candidates(
         layer, hardware, current_mapping, explored_mappings
     )
     bridge_candidates = get_all_bridge_candidates(
-        layer, hardware, current_mapping, explored_mappings
+        layer, hardware, initial_mapping, trans_mapping, current_mapping, explored_mappings
     )
     return swap_candidates + bridge_candidates
 

@@ -92,14 +92,15 @@ class QuantumLayer:
         self,
         dag_circuit: DAGCircuit,
         initial_mapping: ty.Dict[Qubit, int],
-        current_mapping: ty.Dict[Qubit, int],
+        trans_mapping: ty.Dict[Qubit, int],
     ):
-        reversed_current_mapping = {val: key for key, val in current_mapping.items()}
+        reversed_trans_mapping = {val: key for key, val in trans_mapping.items()}
         for op in self._operations:
             logical_qubits = [initial_mapping[qubit] for qubit in op.qargs]
             new_physical_qubits = [
-                reversed_current_mapping[qubit_index] for qubit_index in logical_qubits
+                reversed_trans_mapping[qubit_index] for qubit_index in logical_qubits
             ]
+            #print(new_physical_qubits)
             dag_circuit.apply_operation_back(
                 op.op, new_physical_qubits, op.cargs, op.condition
             )

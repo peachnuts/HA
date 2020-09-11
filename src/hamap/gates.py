@@ -132,10 +132,19 @@ class TwoQubitGate:
     ) -> ty.Dict[Qubit, int]:
         raise NotImplementedError()
 
-    def apply(self, dag_circuit: DAGCircuit, front_layer: QuantumLayer):
+    def apply(self,
+              dag_circuit: DAGCircuit,
+              front_layer: QuantumLayer,
+              initial_mapping: ty.Dict[Qubit, int],
+              trans_mapping: ty.Dict[Qubit, int]
+              ):
         raise NotImplementedError()
 
-    def implements_operation(self, op) -> bool:
+    def implements_operation(self,
+                             op,
+                             initial_mapping: ty.Dict[Qubit, int],
+                             trans_mapping: ty.Dict[Qubit, int],
+                             ) -> bool:
         raise NotImplementedError()
 
     def cost(self, hardware, mapping) -> float:
@@ -151,10 +160,19 @@ class SwapTwoQubitGate(TwoQubitGate):
     ) -> ty.Dict[Qubit, int]:
         return get_updated_mapping(previous_mapping, (self.left, self.right))
 
-    def apply(self, dag_circuit: DAGCircuit, front_layer: QuantumLayer):
+    def apply(self,
+              dag_circuit: DAGCircuit,
+              front_layer: QuantumLayer,
+              initial_mapping: ty.Dict[Qubit, int],
+              trans_mapping: ty.Dict[Qubit, int]
+              ):
         dag_circuit.apply_operation_back(SwapGate(), [self.left, self.right])
 
-    def implements_operation(self, op) -> bool:
+    def implements_operation(self,
+                             op,
+                             initial_mapping: ty.Dict[Qubit, int],
+                             trans_mapping: ty.Dict[Qubit, int],
+                             ) -> bool:
         # The SWAP gate does not implement an operation of the quantum circuit,
         # it is an additional operation changing the mapping.
         return False
@@ -186,7 +204,12 @@ class BridgeTwoQubitGate(TwoQubitGate):
     def middle(self):
         return self._middle
 
-    def apply(self, dag_circuit: DAGCircuit, front_layer: QuantumLayer):
+    def apply(self,
+              dag_circuit: DAGCircuit,
+              front_layer: QuantumLayer,
+              initial_mapping: ty.Dict[Qubit, int],
+              trans_mapping: ty.Dict[Qubit, int]
+              ):
         dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
         dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
         dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
@@ -198,10 +221,11 @@ class BridgeTwoQubitGate(TwoQubitGate):
         # front layer.
         op_to_remove: ty.Optional[DAGNode] = None
         for op in front_layer.ops:
+            q1, q2 = initial_mapping[op.qargs[0]], initial_mapping[op.qargs[1]]
             if (
                 len(op.qargs) == 2
-                and op.qargs[0] == self.left
-                and op.qargs[1] == self.right
+                and q1 == trans_mapping[self.left]
+                and q2 == trans_mapping[self.right]
             ):
                 op_to_remove = op
         if op_to_remove is None:
@@ -212,12 +236,19 @@ class BridgeTwoQubitGate(TwoQubitGate):
         else:
             front_layer.remove_operation(op_to_remove)
 
-    def implements_operation(self, op) -> bool:
+    def implements_operation(self,
+                             op,
+                             initial_mapping: ty.Dict[Qubit, int],
+                             trans_mapping: ty.Dict[Qubit, int]
+                             ) -> bool:
         # The Bridge gate implements a CNOT from the circuit
+        q1, q2 = initial_mapping[op.qargs[0]], initial_mapping[op.qargs[1]]
         return (
             len(op.qargs) == 2
-            and op.qargs[0] == self.left
-            and op.qargs[1] == self.right
+            # and op.qargs[0] == self.left
+            # and op.qargs[1] == self.right
+            and q1 == trans_mapping[self.left]
+            and q2 == trans_mapping[self.right]
         )
 
     def cost(
