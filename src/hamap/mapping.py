@@ -190,13 +190,13 @@ def ha_mapping(
                 best_swap_qubits = SwapTwoQubitGate(
                     swap_control, swap_target
                 )
-                print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
+                #print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
                 trans_mapping[best_swap_qubits.left], trans_mapping[best_swap_qubits.right] = (
                     trans_mapping[best_swap_qubits.right],
                     trans_mapping[best_swap_qubits.left],
                 )
             else:
-                print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
+                #print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
                 pass
             explored_mappings.add(mapping_to_str(current_mapping))
             best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer, initial_mapping, trans_mapping)
@@ -370,13 +370,13 @@ def ha_mapping_paper_compliant(
                 best_swap_qubits = SwapTwoQubitGate(
                     swap_control, swap_target
                 )
-                print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
+                #print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
                 trans_mapping[best_swap_qubits.left], trans_mapping[best_swap_qubits.right] = (
                     trans_mapping[best_swap_qubits.right],
                     trans_mapping[best_swap_qubits.left],
                 )
             else:
-                print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
+                #print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
                 pass
 
             explored_mappings.add(mapping_to_str(current_mapping))
