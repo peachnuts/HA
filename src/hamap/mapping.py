@@ -68,7 +68,7 @@ def _adapt_quantum_circuit_and_mapping_arity(
     initial_mapping: ty.Dict[Qubit, int],
     hardware: IBMQHardwareArchitecture,
 ) -> None:
-    missing_qubit_number = hardware.qubit_number - circuit.n_qubits
+    missing_qubit_number = hardware.qubit_number - circuit.num_qubits
     if missing_qubit_number > 0:
         register = QuantumRegister(missing_qubit_number)
         circuit.add_register(register)
