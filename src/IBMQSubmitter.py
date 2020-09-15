@@ -84,7 +84,8 @@ class IBMQSubmitter:
     def add_circuit(self, circuit: QuantumCircuit, initial_mapping, backend):
         self._circuits.append(self.unroll_and_map_circuit(circuit, initial_mapping, backend))
 
-    def _wait_for_first_job_to_complete(self, jobs):
+    @staticmethod
+    def _wait_for_first_job_to_complete(jobs):
         print("Waiting for job... ", end="", flush=True)
         jobs[0].wait_for_final_state()
         print("Done!")
@@ -106,12 +107,12 @@ class IBMQSubmitter:
             running_jobs.append(job)
             # If we have too much submitted jobs, wait for the first one to finish.
             if len(running_jobs) == self._maximum_batch_job:
-                self._wait_for_first_job_to_complete(running_jobs)
+                IBMQSubmitter._wait_for_first_job_to_complete(running_jobs)
                 self._circuits_results.append(running_jobs[0].result())
                 self._job_ids.append(running_jobs.pop(0).job_id())
         # Wait for the last jobs to finish
         while running_jobs:
-            self._wait_for_first_job_to_complete(running_jobs)
+            IBMQSubmitter._wait_for_first_job_to_complete(running_jobs)
             self._circuits_results.append(running_jobs[0].result())
             self._job_ids.append(running_jobs.pop(0).job_id())
 
