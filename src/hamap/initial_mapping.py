@@ -188,7 +188,9 @@ def _random_execution_policy(
     hardware: IBMQHardwareArchitecture,
     circuit: QuantumCircuit,
 ) -> NeighbourMappingAlgorithmType:
-    def ret(mapping: ty.Dict[Qubit, int]) -> ty.Dict[Qubit, int]:
+    def ret(
+        mapping: ty.Dict[Qubit, int], _0: QuantumCircuit, _1: IBMQHardwareArchitecture
+    ) -> ty.Dict[Qubit, int]:
         p = random.random()
         if p < p1:
             ret_value = algorithms[0](mapping, circuit, hardware)
@@ -284,7 +286,7 @@ def _hardware_aware_expand(
 
 def _random_reset(
     mapping: ty.Dict[Qubit, int],
-    circuit: QuantumCircuit,
+    _: QuantumCircuit,
     hardware: IBMQHardwareArchitecture,
 ) -> ty.Dict[Qubit, int]:
     qubits = list(mapping.keys())
@@ -297,7 +299,7 @@ def _random_reset(
 
 def _hardware_aware_reset(
     mapping: ty.Dict[Qubit, int],
-    circuit: QuantumCircuit,
+    _: QuantumCircuit,
     hardware: IBMQHardwareArchitecture,
 ) -> ty.Dict[Qubit, int]:
     starting_qubit = random.randint(0, hardware.qubit_number - 1)
@@ -332,6 +334,7 @@ def _hardware_aware_reset(
 
 def get_neighbour_improved(
     mapping: ty.Dict[Qubit, int],
+    circuit: QuantumCircuit,
     hardware: IBMQHardwareArchitecture,
     policy: ty.Callable[
         [
@@ -344,7 +347,7 @@ def get_neighbour_improved(
     algorithms: ty.List[NeighbourMappingAlgorithmType],
 ) -> ty.Dict[Qubit, int]:
     algorithm = policy(mapping, hardware, algorithms)
-    return algorithm(mapping, hardware)
+    return algorithm(mapping, circuit, hardware)
 
 
 def get_initial_mapping_from_annealing(
