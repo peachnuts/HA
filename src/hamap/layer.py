@@ -100,7 +100,7 @@ class QuantumLayer:
             new_physical_qubits = [
                 reversed_trans_mapping[qubit_index] for qubit_index in logical_qubits
             ]
-            #print(new_physical_qubits)
+            # print(new_physical_qubits)
             dag_circuit.apply_operation_back(
                 op.op, new_physical_qubits, op.cargs, op.condition
             )

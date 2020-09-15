@@ -134,7 +134,12 @@ def get_all_swap_bridge_candidates(
         layer, hardware, current_mapping, explored_mappings
     )
     bridge_candidates = get_all_bridge_candidates(
-        layer, hardware, initial_mapping, trans_mapping, current_mapping, explored_mappings
+        layer,
+        hardware,
+        initial_mapping,
+        trans_mapping,
+        current_mapping,
+        explored_mappings,
     )
     return swap_candidates + bridge_candidates
 

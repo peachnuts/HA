@@ -50,7 +50,9 @@ from hamap.layer import QuantumLayer, update_layer
 from hamap.mapping_to_str import mapping_to_str
 from hamap.swap import get_all_swap_bridge_candidates, get_all_swap_candidates
 import logging
+
 logger = logging.getLogger("hamap.swap")
+
 
 def _create_empty_dagcircuit_from_existing(dagcircuit: DAGCircuit) -> DAGCircuit:
     result = DAGCircuit()
@@ -97,7 +99,14 @@ def ha_mapping(
         float,
     ] = sabre_heuristic,
     get_candidates: ty.Callable[
-        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Dict[Qubit, int], ty.Dict[Qubit, int], ty.Set[str],],
+        [
+            QuantumLayer,
+            IBMQHardwareArchitecture,
+            ty.Dict[Qubit, int],
+            ty.Dict[Qubit, int],
+            ty.Dict[Qubit, int],
+            ty.Set[str],
+        ],
         ty.List[TwoQubitGate],
     ] = get_all_swap_bridge_candidates,
     get_distance_matrix: ty.Callable[
@@ -162,7 +171,12 @@ def ha_mapping(
             # First list all the SWAPs/Bridges that may help us make some gates
             # executable.
             swap_candidates = get_candidates(
-                front_layer, hardware, initial_mapping, current_mapping, trans_mapping, explored_mappings
+                front_layer,
+                hardware,
+                initial_mapping,
+                current_mapping,
+                trans_mapping,
+                explored_mappings,
             )
             # Then rank the SWAPs/Bridge and take the best one.
             best_swap_qubits = None
@@ -185,21 +199,33 @@ def ha_mapping(
             # We now have our best SWAP/Bridge, let's perform it!
             current_mapping = best_swap_qubits.update_mapping(current_mapping)
             if isinstance(best_swap_qubits, SwapTwoQubitGate):
-                control, target = current_mapping[best_swap_qubits.left], current_mapping[best_swap_qubits.right]
-                swap_control, swap_target = inverse_mapping[control], inverse_mapping[target]
-                best_swap_qubits = SwapTwoQubitGate(
-                    swap_control, swap_target
+                control, target = (
+                    current_mapping[best_swap_qubits.left],
+                    current_mapping[best_swap_qubits.right],
                 )
-                #print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
-                trans_mapping[best_swap_qubits.left], trans_mapping[best_swap_qubits.right] = (
+                swap_control, swap_target = (
+                    inverse_mapping[control],
+                    inverse_mapping[target],
+                )
+                best_swap_qubits = SwapTwoQubitGate(swap_control, swap_target)
+                # print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
+                (
+                    trans_mapping[best_swap_qubits.left],
+                    trans_mapping[best_swap_qubits.right],
+                ) = (
                     trans_mapping[best_swap_qubits.right],
                     trans_mapping[best_swap_qubits.left],
                 )
             else:
-                #print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
+                # print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
                 pass
             explored_mappings.add(mapping_to_str(current_mapping))
-            best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer, initial_mapping, trans_mapping)
+            best_swap_qubits.apply(
+                resulting_dag_quantum_circuit,
+                front_layer,
+                initial_mapping,
+                trans_mapping,
+            )
         # Anyway, update the current front_layer
         current_node_index = update_layer(
             front_layer, topological_nodes, current_node_index
@@ -349,13 +375,21 @@ def ha_mapping_paper_compliant(
                         # Bridge operation
                         continue
                     if len(op.qargs) != 2:
-                        logger.warning("A 3-qubit or more gate has been found in the circuit.")
+                        logger.warning(
+                            "A 3-qubit or more gate has been found in the circuit."
+                        )
                         continue
                     control, target = op.qargs
-                    control_index = initial_mapping[inverse_trans_mapping[initial_mapping[control]]]
-                    target_index = initial_mapping[inverse_trans_mapping[initial_mapping[target]]]
+                    control_index = initial_mapping[
+                        inverse_trans_mapping[initial_mapping[control]]
+                    ]
+                    target_index = initial_mapping[
+                        inverse_trans_mapping[initial_mapping[target]]
+                    ]
                     for _, potential_middle_index in hardware.out_edges(control_index):
-                        for _, potential_target_index in hardware.out_edges(potential_middle_index):
+                        for _, potential_target_index in hardware.out_edges(
+                            potential_middle_index
+                        ):
                             if potential_target_index == target_index:
                                 best_swap_qubits = BridgeTwoQubitGate(
                                     inverse_trans_mapping[initial_mapping[control]],
@@ -365,22 +399,34 @@ def ha_mapping_paper_compliant(
 
             current_mapping = best_swap_qubits.update_mapping(current_mapping)
             if isinstance(best_swap_qubits, SwapTwoQubitGate):
-                control, target = current_mapping[best_swap_qubits.left], current_mapping[best_swap_qubits.right]
-                swap_control, swap_target = inverse_mapping[control], inverse_mapping[target]
-                best_swap_qubits = SwapTwoQubitGate(
-                    swap_control, swap_target
+                control, target = (
+                    current_mapping[best_swap_qubits.left],
+                    current_mapping[best_swap_qubits.right],
                 )
-                #print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
-                trans_mapping[best_swap_qubits.left], trans_mapping[best_swap_qubits.right] = (
+                swap_control, swap_target = (
+                    inverse_mapping[control],
+                    inverse_mapping[target],
+                )
+                best_swap_qubits = SwapTwoQubitGate(swap_control, swap_target)
+                # print("swap gates is :", best_swap_qubits.left, best_swap_qubits.right)
+                (
+                    trans_mapping[best_swap_qubits.left],
+                    trans_mapping[best_swap_qubits.right],
+                ) = (
                     trans_mapping[best_swap_qubits.right],
                     trans_mapping[best_swap_qubits.left],
                 )
             else:
-                #print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
+                # print("brige gate is :", best_swap_qubits.left, best_swap_qubits.middle, best_swap_qubits.right)
                 pass
 
             explored_mappings.add(mapping_to_str(current_mapping))
-            best_swap_qubits.apply(resulting_dag_quantum_circuit, front_layer, initial_mapping, trans_mapping)
+            best_swap_qubits.apply(
+                resulting_dag_quantum_circuit,
+                front_layer,
+                initial_mapping,
+                trans_mapping,
+            )
         # Anyway, update the current front_layer
         current_node_index = update_layer(
             front_layer, topological_nodes, current_node_index
