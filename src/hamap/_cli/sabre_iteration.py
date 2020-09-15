@@ -67,7 +67,7 @@ def test_iterated_sabre(
     initial_mapping: ty.Optional[ty.Dict[Qubit, int]] = None,
 ) -> int:
     quantum_circuit = add_qubits_to_quantum_circuit(quantum_circuit, hardware)
-    circuit, mapping = initial_mapping_from_iterative_forward_backward(
+    circuit, cost, mapping = initial_mapping_from_iterative_forward_backward(
         quantum_circuit,
         hardware,
         mapping_algorithm=mapping_algorithm,
@@ -87,7 +87,8 @@ def main():
 
     for i in range(1, N):
         print(
-            f"Swap number {i}: {test_iterated_sabre(circuit, hardware, i, initial_mapping)}"
+            f"Swap number {i}: "
+            f"{test_iterated_sabre(circuit, hardware, i, initial_mapping)}"
         )
 
 

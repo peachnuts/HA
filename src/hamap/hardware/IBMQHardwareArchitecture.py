@@ -120,7 +120,6 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
         logger.info("Loading IBMQ account.")
         try:
             IBMQ.load_account()
-            # provider = IBMQ.load_account()
             provider = IBMQ.get_provider(
                 hub="ibm-q-france", group="univ-montpellier", project="default"
             )
@@ -267,11 +266,11 @@ class IBMQHardwareArchitecture(HardwareArchitecture):
         """
         return self.nodes[qubit_index][operation]["gate_error"]
 
-    def get_qubit_T1(self, qubit_index: int) -> float:
+    def get_qubit_t1(self, qubit_index: int) -> float:
         """Returns the T1 characteristic time for the given qubit index."""
         return self.nodes[qubit_index]["T1"]
 
-    def get_qubit_T2(self, qubit_index: int) -> float:
+    def get_qubit_t2(self, qubit_index: int) -> float:
         """Returns the T2 characteristic time for the given qubit index."""
         return self.nodes[qubit_index]["T2"]
 

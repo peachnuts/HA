@@ -210,8 +210,6 @@ def mapping_algorithm(quantum_circuit: QuantumCircuit, hardware, initial_mapping
 
     # 5. QuantumCircuit from the QASM
     mapped_quantum_circuit = QuantumCircuit.from_qasm_file(output)
-    mapped_quantum_circuit = QuantumCircuit.from_qasm_file(output)
-    # print(mapped_quantum_circuit.count_ops())
     return mapped_quantum_circuit, final_mapping
 
 

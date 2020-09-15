@@ -55,8 +55,8 @@ def _is_fixed_point(swap_numbers: ty.List[int]) -> bool:
     return swap_numbers[-1] == swap_numbers[-2]
 
 
-def _argmin(l: ty.Iterable) -> int:
-    return min(((v, i) for i, v in enumerate(l)), key=lambda tup: tup[0])[1]
+def _argmin(it: ty.Iterable) -> int:
+    return min(((v, i) for i, v in enumerate(it)), key=lambda tup: tup[0])[1]
 
 
 def _count_swaps(circuit: QuantumCircuit) -> int:
@@ -371,7 +371,7 @@ def get_initial_mapping_from_annealing(
 
     mapping, cost, iteration_number = simulated_annealing(
         initial_mapping,
-        lambda mapping: cost_function(mapping, quantum_circuit, hardware),
+        lambda mapp: cost_function(mapp, quantum_circuit, hardware),
         get_neighbour_func,
         temp_begin,
         max_steps,

@@ -257,7 +257,7 @@ def ha_mapping_paper_compliant(
         ],
     ] = sabre_heuristic_with_effect,
     get_candidates: ty.Callable[
-        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Set[str],],
+        [QuantumLayer, IBMQHardwareArchitecture, ty.Dict[Qubit, int], ty.Set[str]],
         ty.List[SwapTwoQubitGate],
     ] = get_all_swap_candidates,
     get_distance_matrix: ty.Callable[
@@ -304,7 +304,6 @@ def ha_mapping_paper_compliant(
         front_layer, topological_nodes, current_node_index
     )
 
-    swap_distance_matrix = get_distance_matrix_swap_number(hardware)
     trans_mapping = initial_mapping.copy()
     # Start of the iterative algorithm
     while not front_layer.is_empty():
@@ -352,25 +351,12 @@ def ha_mapping_paper_compliant(
                     best_effect = swap_effect
                     best_swap_qubits = potential_swap
             # We now have our best SWAP, let's check if a Bridge is not better
-            # if (
-            #     best_effect < 0
-            #     and swap_distance_matrix[best_swap_qubits.left][best_swap_qubits.right]
-            #     == 2
-            # ):
-            #     i, j = best_swap_qubits
-            #     common_neighbours = set(hardware.neighbors(i)) & set(
-            #         hardware.neighbors(j)
-            #     )
-            #     if len(common_neighbours) < 1:
-            #         raise RuntimeError("Less than one common neighbour")
-            #     common_neighbour = list(common_neighbours)[0]
-            #     best_gate = BridgeTwoQubitGate(i, common_neighbour, j)
             if best_effect < 0:
                 inverse_trans_mapping = {val: key for key, val in trans_mapping.items()}
                 for op in front_layer.ops:
                     if len(op.qargs) < 2:
-                        # We just pass 1 qubit gates because they do not participate in the
-                        # Bridge operation
+                        # We just pass 1 qubit gates because they do not participate in
+                        # the Bridge operation
                         continue
                     if len(op.qargs) != 2:
                         logger.warning(

@@ -63,8 +63,8 @@ def _seed_random():
     random.seed()
 
 
-def _argmin(l: ty.Iterable) -> int:
-    return min(((v, i) for i, v in enumerate(l)), key=lambda tup: tup[0])[1]
+def _argmin(it: ty.Iterable) -> int:
+    return min(((v, i) for i, v in enumerate(it)), key=lambda tup: tup[0])[1]
 
 
 def read_benchmark_circuit(category: str, name: str) -> QuantumCircuit:
@@ -84,11 +84,11 @@ def separate_lists(iterable):
 
 
 def separate_lists_all_values_of_n(iterable):
-    l = list(iterable)
-    n_values_number = len(l[0][0])
+    lst = list(iterable)
+    n_values_number = len(lst[0][0])
     ret1 = [[] for _ in range(n_values_number)]
     ret2 = [[] for _ in range(n_values_number)]
-    for elem1, elem2 in l:
+    for elem1, elem2 in lst:
         for k in range(n_values_number):
             ret1[k].append(elem1[k])
             ret2[k].append(elem2[k])
