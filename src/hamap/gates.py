@@ -39,7 +39,7 @@ from qiskit.circuit import Gate, QuantumRegister
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
 from qiskit.extensions.standard.swap import SwapGate
-from qiskit.extensions.standard.x import CnotGate
+from qiskit.extensions.standard.x import XGate
 
 from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.layer import QuantumLayer
@@ -58,15 +58,15 @@ class _BridgeGate(Gate):
         """
         gate bridge a,b,c { cx a,b; cx b,c; cx a,b; cx b,c; }
         """
-        from qiskit.extensions.standard.x import CnotGate
+        from qiskit.extensions.standard.x import XGate
 
         definition = []
         q = QuantumRegister(3, "q")
         rule = [
-            (CnotGate(), [q[0], q[1]], []),
-            (CnotGate(), [q[1], q[2]], []),
-            (CnotGate(), [q[0], q[1]], []),
-            (CnotGate(), [q[1], q[2]], []),
+            (XGate(), [q[0], q[1]], []),
+            (XGate(), [q[1], q[2]], []),
+            (XGate(), [q[0], q[1]], []),
+            (XGate(), [q[1], q[2]], []),
         ]
         for inst in rule:
             definition.append(inst)
@@ -215,10 +215,10 @@ class BridgeTwoQubitGate(TwoQubitGate):
         initial_mapping: ty.Dict[Qubit, int],
         trans_mapping: ty.Dict[Qubit, int],
     ):
-        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
-        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(XGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(XGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(XGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(XGate(), [self.middle, self.right])
         # dag_circuit.apply_operation_back(
         #     _BridgeGate(), [self.left, self.middle, self.right]
         # )
