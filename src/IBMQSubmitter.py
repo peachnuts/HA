@@ -30,20 +30,16 @@
 # knowledge of the CeCILL-B license and that you accept its terms.
 # ======================================================================
 
-from copy import deepcopy
-import time
 import pickle
 
 from qiskit.providers.ibmq import IBMQBackend
-from qiskit import QuantumCircuit, execute, transpile, assemble
+from qiskit import QuantumCircuit, assemble
 
 from qiskit.transpiler.passes.layout import SetLayout, ApplyLayout
 from qiskit.transpiler.passes.basis.unroller import Unroller
 from qiskit.transpiler.passmanager import PassManager
 from qiskit.transpiler import Layout
-from qiskit.transpiler.passmanager_config import PassManagerConfig
-from qiskit.transpiler.preset_passmanagers import level_0_pass_manager
-from qiskit.transpiler import CouplingMap
+
 
 class IBMQSubmitter:
     def __init__(self, backend: IBMQBackend, tags=None):
@@ -63,7 +59,7 @@ class IBMQSubmitter:
         return len(self._circuits)
 
     def unroll_and_map_circuit(
-        self, circuit: QuantumCircuit, mapping, backend
+        self, circuit: QuantumCircuit, mapping
     ) -> QuantumCircuit:
         layout = Layout({q: i for q, i in zip(circuit.qubits, mapping)})
         pm = PassManager(
@@ -73,16 +69,10 @@ class IBMQSubmitter:
                 Unroller(self._backend.configuration().basis_gates),
             ]
         )
-        # pm = level_0_pass_manager(PassManagerConfig(
-        #     initial_layout = layout,
-        #     basis_gates=backend.configuration().basis_gates,
-        #     coupling_map=CouplingMap(backend.configuration().coupling_map),
-        #     backend_properties=backend.properties()
-        # ))
         return pm.run(circuit)
 
     def add_circuit(self, circuit: QuantumCircuit, initial_mapping, backend):
-        self._circuits.append(self.unroll_and_map_circuit(circuit, initial_mapping, backend))
+        self._circuits.append(self.unroll_and_map_circuit(circuit, initial_mapping))
 
     @staticmethod
     def _wait_for_first_job_to_complete(jobs):
