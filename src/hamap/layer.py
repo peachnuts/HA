@@ -100,7 +100,6 @@ class QuantumLayer:
             new_physical_qubits = [
                 reversed_trans_mapping[qubit_index] for qubit_index in logical_qubits
             ]
-            # print(new_physical_qubits)
             dag_circuit.apply_operation_back(
                 op.op, new_physical_qubits, op.cargs, op.condition
             )
@@ -112,104 +111,6 @@ class QuantumLayer:
     def ops(self) -> ty.List[DAGNode]:
         """Returns the list of **all** the operations."""
         return self._operations
-
-
-#
-# class IgnoringQuantumLayer(QuantumLayer):
-#     """A class that ignores some quantum operations.
-#
-#     Ignoring in this context means that the ignored gates are not counted in the gate
-#     depth or in the gate count.
-#     WARNING: ignored gates are still added to the layer internally and will be
-#     present in the ops attribute, or will be added to the DAGCircuit in
-#     apply_back_to_dag_circuit.
-#     """
-#
-#     def __init__(
-#         self, is_operation_ignored: ty.Callable[[DAGNode], bool], max_depth: int = 1
-#     ):
-#         super().__init__(max_depth)
-#         # self._is_operation_ignored = is_operation_ignored
-#         self._is_operation_ignored = lambda x: False
-#         self._ignored_operation_count = 0
-#
-#     def is_operation_addable(self, op: DAGNode) -> bool:
-#         if self._is_operation_ignored(op):
-#             return True
-#         return super().is_operation_addable(op)
-#
-#     def add_operation(self, op: DAGNode):
-#         if self._is_operation_ignored(op):
-#             self._ignored_operation_count += 1
-#             self._operations.append(op)
-#             return
-#         super().add_operation(op)
-#
-#     def remove_operation(self, op: DAGNode):
-#         if self._is_operation_ignored(op):
-#             self._ignored_operation_count -= 1
-#             self._operations.remove(op)
-#             return
-#         super().remove_operation(op)
-#
-#     def __len__(self) -> int:
-#         return super().__len__() - self._ignored_operation_count
-#
-#     @staticmethod
-#     def _compose_ignore_functions(*functions_to_compose):
-#         def _internal_function(x):
-#             result = False
-#             for func in functions_to_compose:
-#                 result = result or func(x)
-#             return result
-#
-#         return _internal_function
-#
-#
-# class IBMQQuantumLayer(IgnoringQuantumLayer):
-#     @staticmethod
-#     def _is_ibmq_ignored_operation(op: DAGNode) -> bool:
-#         return op.name == "barrier"
-#
-#     def __init__(
-#         self,
-#         is_operation_ignored: ty.Callable[[DAGNode], bool] = None,
-#         max_depth: int = 1,
-#     ):
-#         if is_operation_ignored is None:
-#             is_operation_ignored = IBMQQuantumLayer._is_ibmq_ignored_operation
-#         else:
-#             # We need to compose the two functions in one.
-#             is_operation_ignored = IgnoringQuantumLayer._compose_ignore_functions(
-#                 is_operation_ignored, IBMQQuantumLayer._is_ibmq_ignored_operation
-#             )
-#         super().__init__(is_operation_ignored, max_depth)
-#
-#
-# class IBMQOnlyCNOTQuantumLayer(IBMQQuantumLayer):
-#     """A class where only CNOT are accounted in the depth.
-#
-#     1-qubit gates are still added, but not counted in the maximum depth or in the
-#     gate count.
-#     """
-#
-#     @staticmethod
-#     def _is_1_qubit_gate(op: DAGNode) -> bool:
-#         return len(op.qargs) == 1
-#
-#     def __init__(
-#         self,
-#         is_operation_ignored: ty.Callable[[DAGNode], bool] = None,
-#         max_depth: int = 1,
-#     ):
-#         if is_operation_ignored is None:
-#             is_operation_ignored = IBMQOnlyCNOTQuantumLayer._is_1_qubit_gate
-#         else:
-#             # We need to compose the two functions in one.
-#             is_operation_ignored = IgnoringQuantumLayer._compose_ignore_functions(
-#                 is_operation_ignored, IBMQOnlyCNOTQuantumLayer._is_1_qubit_gate
-#             )
-#         super().__init__(is_operation_ignored, max_depth)
 
 
 def update_layer(

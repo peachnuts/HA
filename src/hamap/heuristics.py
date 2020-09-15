@@ -141,8 +141,6 @@ def sabre_heuristic(
     # implementing it for the moment...
     # H += (H_basic / H_basic_gate_number) if H_basic_gate_number != 0 else 0
     H = (H_basic + H_tentative) / (H_basic_gate_number + H_tentative_gate_number)
-    # print(type(tentative_gate), tentative_gate.left, tentative_gate.right, H, H_basic, H_basic_gate_number)
-    # print(front_layer.ops[0].qargs)
     H_extended = 0.0
     if future_nodes_layer:
         # Only add this cost if there are nodes in the future_node_layer
@@ -156,7 +154,6 @@ def sabre_heuristic(
         )
 
     H += H_extended
-    # print(f"H extended {H_extended} and final H is {H}, gate number {len(future_nodes_layer)}")
     return H
 
 
