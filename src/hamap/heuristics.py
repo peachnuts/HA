@@ -124,10 +124,10 @@ def sabre_heuristic(
     # ability.
 
     if isinstance(tentative_gate, SwapTwoQubitGate):
-        H_tentative += tentative_gate.cost(hardware, current_mapping)
+        H_tentative += tentative_gate.cost(hardware, current_mapping, distance_matrix)
         H_tentative_gate_number += 3
     else:
-        H_tentative += tentative_gate.cost(hardware, initial_mapping)
+        H_tentative += tentative_gate.cost(hardware, initial_mapping, distance_matrix)
         H_tentative_gate_number += 4
 
 

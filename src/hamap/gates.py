@@ -147,7 +147,7 @@ class TwoQubitGate:
                              ) -> bool:
         raise NotImplementedError()
 
-    def cost(self, hardware, mapping) -> float:
+    def cost(self, hardware, mapping, distance_matrix,) -> float:
         raise NotImplementedError()
 
 
@@ -178,14 +178,14 @@ class SwapTwoQubitGate(TwoQubitGate):
         return False
 
     def cost(
-        self, hardware: IBMQHardwareArchitecture, mapping: ty.Dict[Qubit, int]
+            self, hardware: IBMQHardwareArchitecture,
+            mapping: ty.Dict[Qubit, int],
+            distance_matrix: numpy.ndarray,
     ) -> float:
-        a = hardware.weight_function(
-            (mapping[self.left], mapping[self.right]), hardware
-        )
-        b = hardware.weight_function(
-            (mapping[self.right], mapping[self.left]), hardware
-        )
+        a = distance_matrix.item(mapping[self.left], mapping[self.right])
+
+        b = distance_matrix.item(mapping[self.right], mapping[self.left])
+
         return a + b + min(a, b)
 
 
@@ -252,12 +252,11 @@ class BridgeTwoQubitGate(TwoQubitGate):
         )
 
     def cost(
-        self, hardware: IBMQHardwareArchitecture, mapping: ty.Dict[Qubit, int]
+            self,
+            hardware: IBMQHardwareArchitecture,
+            mapping: ty.Dict[Qubit, int],
+            distance_matrix: numpy.ndarray,
     ) -> float:
-        a = hardware.weight_function(
-            (mapping[self.left], mapping[self.middle]), hardware
-        )
-        b = hardware.weight_function(
-            (mapping[self.middle], mapping[self.right]), hardware
-        )
+        a = distance_matrix.item(mapping[self.left], mapping[self.middle])
+        b = distance_matrix.item(mapping[self.middle], mapping[self.right])
         return 2 * (a + b)

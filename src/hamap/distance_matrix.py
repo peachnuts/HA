@@ -105,14 +105,28 @@ def get_distance_matrix_mixed(
     coefficient_sum = swap_weight + execution_time_weight + error_weight
     if coefficient_sum < 1e-10:
         raise RuntimeError("The coefficients you provided are too small.")
-    hardware.weight_function = partial(
-        _get_mixed_cost,
-        swap_weight=swap_weight,
-        execution_time_weight=execution_time_weight,
-        error_weight=error_weight,
-    )
-    return nx.floyd_warshall_numpy(hardware)
+    # hardware.weight_function = partial(
+    #     _get_mixed_cost,
+    #     swap_weight=swap_weight,
+    #     execution_time_weight=execution_time_weight,
+    #     error_weight=error_weight,
+    # )
+    # return nx.floyd_warshall_numpy(hardware)
+    distance_matrix_swap_number = get_distance_matrix_error_cost(hardware)
+    norm_swap_number = numpy.linalg.norm(distance_matrix_swap_number)
+    swap_cost = swap_weight * distance_matrix_swap_number / norm_swap_number
 
+    distance_matrix_execution_time = get_distance_matrix_execution_time_cost(hardware)
+    norm_execution_time = numpy.linalg.norm(distance_matrix_execution_time)
+    execution_time_cost = execution_time_weight * distance_matrix_execution_time / norm_execution_time
+
+    distance_matrix_error_cost = get_distance_matrix_swap_number(hardware)
+    norm_error_cost = numpy.linalg.norm(distance_matrix_error_cost)
+    error_cost = error_weight * distance_matrix_error_cost / norm_error_cost
+
+    return (swap_cost + execution_time_cost + error_cost) / (
+            swap_weight + execution_time_weight + error_weight
+    )
 
 def get_distance_matrix_swap_number_and_error(
     hardware: IBMQHardwareArchitecture,
