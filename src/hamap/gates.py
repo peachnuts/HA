@@ -38,8 +38,8 @@ import numpy
 from qiskit.circuit import Gate, QuantumRegister
 from qiskit.circuit.quantumregister import Qubit
 from qiskit.dagcircuit.dagcircuit import DAGCircuit, DAGNode
-from qiskit.extensions.standard.swap import SwapGate
-from qiskit.extensions.standard.x import CnotGate
+from qiskit.circuit.library.standard_gates.swap import SwapGate
+from qiskit.circuit.library.standard_gates.x import CXGate
 
 from hamap.hardware.IBMQHardwareArchitecture import IBMQHardwareArchitecture
 from hamap.layer import QuantumLayer
