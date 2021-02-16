@@ -210,10 +210,10 @@ class BridgeTwoQubitGate(TwoQubitGate):
               initial_mapping: ty.Dict[Qubit, int],
               trans_mapping: ty.Dict[Qubit, int]
               ):
-        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
-        dag_circuit.apply_operation_back(CnotGate(), [self.left, self.middle])
-        dag_circuit.apply_operation_back(CnotGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(CXGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(CXGate(), [self.middle, self.right])
+        dag_circuit.apply_operation_back(CXGate(), [self.left, self.middle])
+        dag_circuit.apply_operation_back(CXGate(), [self.middle, self.right])
         # dag_circuit.apply_operation_back(
         #     _BridgeGate(), [self.left, self.middle, self.right]
         # )
